@@ -1,0 +1,28 @@
+# Example fly.toml for Fly.io. Copy to fly.toml and set app name before deploying.
+app = "your-fly-app-name"
+
+[build]
+  # Use the Dockerfile in backend/
+  dockerfile = "backend/Dockerfile"
+
+[env]
+  # Example environment variables - override on Fly dashboard or with flyctl
+  NODE_ENV = "production"
+  # MONGODB_URI = ""
+
+[[services]]
+  internal_port = 5000
+  protocol = "tcp"
+
+  [services.concurrency]
+    type = "connections"
+    hard_limit = 200
+    soft_limit = 150
+
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls","http"]
+    port = 443

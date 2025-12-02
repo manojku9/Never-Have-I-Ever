@@ -70,6 +70,20 @@ app.get('/api/health', (req, res) => {
 // Socket.io connection handling
 require('./socket/socketHandler')(io);
 
+// Serve static frontend in production (if frontend build exists)
+if (process.env.NODE_ENV === 'production') {
+  const path = require('path');
+  const buildPath = path.join(__dirname, '..', 'frontend', 'build');
+
+  // Serve static files
+  app.use(express.static(buildPath));
+
+  // Fall back to index.html for React Router
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(buildPath, 'index.html'));
+  });
+}
+
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   console.log(`Socket.io server initialized`);

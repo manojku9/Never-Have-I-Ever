@@ -5,7 +5,9 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "postinstall": "npm --prefix ../frontend ci && npm --prefix ../frontend run build",
+    "heroku-postbuild": "npm --prefix ../frontend ci && npm --prefix ../frontend run build"
   },
   "keywords": [],
   "author": "",
