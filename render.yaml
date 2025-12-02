@@ -1,0 +1,21 @@
+# Render infrastructure-as-code example for this project.
+# Copy this file, update `name` fields, and either create services in the Render dashboard
+# or use the Render CLI to create/update services.
+
+services:
+  - type: web
+    name: nhie-backend
+    env: node
+    plan: free
+    branch: main
+    region: oregon
+    buildCommand: cd backend && npm ci
+    startCommand: cd backend && npm start
+    disk: 0
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        value: ""
+      - key: CLIENT_URL
+        value: ""

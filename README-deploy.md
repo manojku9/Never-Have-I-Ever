@@ -76,7 +76,40 @@ Steps:
 Important: Socket.IO is a long-lived WebSocket server. Vercel's serverless functions are not suitable to host a Socket.IO server reliably. So you should host the backend (the Socket.IO + Express server) on a platform that supports persistent sockets (Render, Railway, Heroku, or a VPS). Then point the frontend's environment variables to that backend URL as shown above.
 
 Deploying backend (socket server)
-- Host the backend on Render, Railway, Heroku, or a VPS. See the "Render / Railway" or "Heroku" sections above — the backend must be reachable over HTTPS and must have the environment variable `CLIENT_URL` set to your Vercel app domain (for CORS): e.g. `https://your-app.vercel.app`.
+
+Render YAML (optional)
+
+There is a `render.yaml` template at the repo root that describes a single Web Service which builds the `backend` (the backend's `postinstall` builds the frontend). To use it:
+
+- Update `render.yaml` and change the `name` field under `services` to a unique Render service name (for example `my-app-backend`).
+- You can either create the service through the Render dashboard (recommended) or use the Render CLI to create/update the service from this file.
+
+If using the Render dashboard, follow the UI steps below for a single-service deployment. If you prefer CLI, install Render CLI and use it to apply the configuration (CLI usage may change over time; consult Render docs if needed).
+
+CI auto-deploy (GitHub Actions) — Vercel + Fly
+
+I added a GitHub Actions workflow at `.github/workflows/deploy.yml` that will:
+- Build and deploy the frontend to Vercel.
+- Build and deploy the backend to Fly (uses the provided `fly.toml` / Dockerfile).
+
+Required GitHub Secrets (repository Settings → Secrets → Actions):
+- `VERCEL_TOKEN` — your Vercel personal token (create at https://vercel.com/account/tokens)
+- `VERCEL_ORG_ID` — your Vercel organization ID (you can find it in the project settings or via the Vercel CLI)
+- `VERCEL_PROJECT_ID` — your Vercel project ID (found in project settings)
+- `FLY_API_TOKEN` — Fly API token (create at https://fly.io/account/personal_access_tokens)
+
+Optional DockerHub secrets (only if you want to push images to Docker Hub as part of CI):
+- `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` (the workflow logs in if provided)
+
+How to use
+1. Add the secrets above to your GitHub repo.
+2. Push to `main`.
+3. The workflow will run and deploy the frontend to Vercel and the backend to Fly.
+
+Notes
+- You must have created the Vercel project beforehand or know its org/project IDs.
+- For Fly, ensure `fly.toml` exists at the repo root or update the workflow to pass `--app <your-app-name>` in the deploy args.
+- If you prefer manual/developer-first deploys, you can skip adding these secrets and instead run the explicit `flyctl` and Vercel CLI commands locally as shown earlier.
 
 Testing after deploy
 1. Deploy backend to Render/Heroku and copy its public URL (e.g. `https://my-backend.onrender.com`).
