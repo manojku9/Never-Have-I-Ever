@@ -1,6 +1,8 @@
+// ...existing code...
 import React, { useState, useEffect } from 'react';
 import './GameBoard.css';
 
+// ...existing code...
 const MultiplayerGameBoard = ({ 
   room, 
   playerName, 
@@ -18,7 +20,7 @@ const MultiplayerGameBoard = ({
       setShowResults(false);
       setWaitingForOthers(false);
     }
-  }, [room?.currentQuestion]);
+  }, [room, room.currentQuestion]);
 
   useEffect(() => {
     if (!socket) return;
@@ -56,17 +58,25 @@ const MultiplayerGameBoard = ({
 
   const handleSubmit = () => {
     if (selectedPlayers.length === 0) return;
+    if (!socket) {
+      console.warn('Socket not connected - cannot submit selection');
+      return;
+    }
     
     setWaitingForOthers(true);
     socket.emit('player-selection', {
-      roomCode: room.roomCode,
+      roomCode: room?.roomCode,
       selectedPlayers: selectedPlayers
     });
   };
 
   const handleNext = () => {
     if (!isHost) return;
-    socket.emit('next-question', { roomCode: room.roomCode });
+    if (!socket) {
+      console.warn('Socket not connected - cannot go to next question');
+      return;
+    }
+    socket.emit('next-question', { roomCode: room?.roomCode });
   };
 
   if (!room || !room.currentQuestion) {
@@ -110,7 +120,7 @@ const MultiplayerGameBoard = ({
           <div className="players-section">
             <h3 className="section-title">Who has done this? (Click to select)</h3>
             <div className="players-grid">
-              {room.players.map((player) => (
+              {(room.players || []).map((player) => (
                 <button
                   key={player.socketId}
                   onClick={() => handlePlayerClick(player.name)}
@@ -173,4 +183,4 @@ const MultiplayerGameBoard = ({
 };
 
 export default MultiplayerGameBoard;
-
+// ...existing code...
