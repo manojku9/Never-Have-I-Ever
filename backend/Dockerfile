@@ -3,12 +3,11 @@ FROM node:20-alpine
 # Create app directory
 WORKDIR /usr/src/app
 
-# Install dependencies
-COPY package*.json ./
-RUN npm ci --only=production
-
-# Copy app source
+# Copy entire repository into the image so the frontend folder is available for postinstall
 COPY . .
+
+# Install dependencies (this will run postinstall which builds the frontend)
+RUN npm ci --only=production
 
 # Expose port (Fly sets PORT env variable at runtime)
 EXPOSE 5000
